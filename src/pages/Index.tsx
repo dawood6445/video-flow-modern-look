@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,6 +21,19 @@ import AdSection from "@/components/AdSection";
 
 const Index = () => {
   const [url, setUrl] = useState("");
+  const navigate = useNavigate();
+
+  const handleDownload = () => {
+    if (url.trim()) {
+      navigate(`/download?video_url=${encodeURIComponent(url.trim())}`);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleDownload();
+    }
+  };
 
   const features = [
     {
@@ -85,14 +97,16 @@ const Index = () => {
                   placeholder="Paste video URL here..."
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
+                  onKeyPress={handleKeyPress}
                   className="flex-1 h-12 bg-background/50 border-border text-foreground placeholder:text-muted-foreground"
                 />
-                <Link to="/download">
-                  <Button className="h-12 px-8 bg-gradient-to-r from-primary to-green-400 hover:from-primary/90 hover:to-green-400/90 text-black font-medium w-full sm:w-auto">
-                    <Download className="mr-2 h-5 w-5" />
-                    Download
-                  </Button>
-                </Link>
+                <Button 
+                  onClick={handleDownload}
+                  className="h-12 px-8 bg-gradient-to-r from-primary to-green-400 hover:from-primary/90 hover:to-green-400/90 text-black font-medium w-full sm:w-auto"
+                >
+                  <Download className="mr-2 h-5 w-5" />
+                  Download
+                </Button>
               </div>
             </div>
 
