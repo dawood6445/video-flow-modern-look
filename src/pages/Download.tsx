@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -47,7 +46,7 @@ const DownloadPage = () => {
   }, [searchParams]);
 
   const fetchVideoData = async (videoUrl: string): Promise<VideoData> => {
-    const apiUrl = `http://api.latestvideodownloader.com/Home/GetVideo/?url=${encodeURIComponent(videoUrl)}&AccessKey=wECqRVdJmEBbHT94bY4s4w==&SourceID=9&VersionNo=1.111`;
+    const apiUrl = `https://api.latestvideodownloader.com/Home/GetVideo/?url=${encodeURIComponent(videoUrl)}&AccessKey=wECqRVdJmEBbHT94bY4s4w==&SourceID=9&VersionNo=1.111`;
     
     const response = await fetch(apiUrl, {
       method: 'GET',
@@ -267,7 +266,7 @@ const DownloadPage = () => {
           <Card className="glass-effect border-border">
             <CardContent className="p-6 text-center">
               <FileVideo className="h-8 w-8 text-blue-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibent text-foreground mb-2">Fast Downloads</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-2">Fast Downloads</h3>
               <p className="text-muted-foreground text-sm">Lightning-fast download speeds</p>
             </CardContent>
           </Card>
