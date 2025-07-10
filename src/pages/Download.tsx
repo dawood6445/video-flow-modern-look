@@ -1,9 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Download, Play, FileVideo, Image, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -33,8 +33,6 @@ const DownloadPage = () => {
   const [url, setUrl] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [videoInfo, setVideoInfo] = useState<VideoData | null>(null);
-  const [downloadProgress, setDownloadProgress] = useState(0);
-  const [isDownloading, setIsDownloading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -108,27 +106,8 @@ const DownloadPage = () => {
     }
   };
 
-  const handleDownload = (media: VideoMedia) => {
-    setIsDownloading(true);
-    setDownloadProgress(0);
-    
-    // Simulate download progress
-    const interval = setInterval(() => {
-      setDownloadProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsDownloading(false);
-          toast({
-            title: "Download Started!",
-            description: `Video download initiated in ${media.quality} quality`
-          });
-          // Open the download URL in a new tab
-          window.open(media.url, '_blank');
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 200);
+  const handleDownload = (mediaUrl: string) => {
+    window.open(mediaUrl, '_blank');
   };
 
   return (
@@ -143,109 +122,89 @@ const DownloadPage = () => {
           </p>
         </div>
 
-        <Card className="glass-effect border-border mb-8">
-          <CardHeader>
-            <CardTitle className="text-foreground flex items-center">
-              <Download className="mr-2 h-5 w-5" />
-              Download Video
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Input
-                type="url"
-                placeholder="https://youtube.com/watch?v=..."
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleAnalyze()}
-                className="flex-1 bg-background/50 border-border text-foreground placeholder:text-muted-foreground"
-              />
-              <Button 
-                onClick={() => handleAnalyze()}
-                disabled={isAnalyzing}
-                className="bg-gradient-to-r from-primary to-green-400 hover:from-primary/90 hover:to-green-400/90 text-black border-none"
-              >
-                {isAnalyzing ? "Analyzing..." : "Analyze Video"}
-              </Button>
+        {/* Main Container matching WordPress style */}
+        <div className="max-w-3xl mx-auto bg-card rounded-lg shadow-lg p-6 mb-8">
+          {/* Input Section */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <Input
+              type="url"
+              placeholder="Paste your video link here"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleAnalyze()}
+              className="flex-1 h-12 border-2 border-primary bg-background text-foreground placeholder:text-muted-foreground"
+            />
+            <Button 
+              onClick={() => handleAnalyze()}
+              disabled={isAnalyzing}
+              className="h-12 px-6 bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+            >
+              {isAnalyzing ? "Loading..." : "Download"}
+            </Button>
+          </div>
+
+          {/* Loading State */}
+          {isAnalyzing && (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Fetching Video Data...</p>
+              <p className="text-sm text-muted-foreground">Please wait while we fetch the video details.</p>
             </div>
+          )}
 
-            {isAnalyzing && (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                <p className="text-muted-foreground">Analyzing video...</p>
-              </div>
-            )}
-
-            {videoInfo && !isAnalyzing && (
-              <div className="space-y-6">
-                <div className="flex flex-col md:flex-row gap-6">
-                  <img 
-                    src={videoInfo.thumbnail} 
-                    alt="Video thumbnail"
-                    className="w-full md:w-64 h-36 object-cover rounded-lg"
-                  />
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
-                      {videoInfo.title}
-                    </h3>
-                    <div className="space-y-1 text-muted-foreground">
-                      <p>Status: {videoInfo.status}</p>
-                      <p>Available formats: {videoInfo.medias.length}</p>
-                    </div>
-                  </div>
+          {/* Video Info Section - matching WordPress layout */}
+          {videoInfo && !isAnalyzing && (
+            <div className="space-y-6">
+              {/* Thumbnail and Title Section */}
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-5">
+                <img 
+                  src={videoInfo.thumbnail} 
+                  alt="Video Thumbnail"
+                  className="w-full md:w-72 h-48 md:h-40 object-cover rounded border flex-shrink-0"
+                />
+                <div className="flex-grow">
+                  <h3 className="text-xl font-semibold text-foreground leading-tight">
+                    {videoInfo.title}
+                  </h3>
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {videoInfo.medias.map((media, index) => (
-                    <Card key={index} className="glass-effect border-border">
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <div className="flex items-center text-foreground font-medium">
-                              {media.extension === 'mp3' ? (
-                                <Image className="mr-2 h-4 w-4" />
-                              ) : (
-                                <FileVideo className="mr-2 h-4 w-4" />
-                              )}
-                              {media.quality}
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              {media.formattedSize} • {media.extension.toUpperCase()}
-                            </div>
-                            <div className="text-xs text-muted-foreground mt-1">
-                              {media.videoAvailable ? "Video" : ""} 
-                              {media.videoAvailable && media.audioAvailable ? " + " : ""}
-                              {media.audioAvailable ? "Audio" : ""}
-                            </div>
-                          </div>
-                          <Button
-                            onClick={() => handleDownload(media)}
-                            disabled={isDownloading}
-                            size="sm"
-                            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-
-                {isDownloading && (
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                      <span>Preparing download...</span>
-                      <span>{downloadProgress}%</span>
-                    </div>
-                    <Progress value={downloadProgress} className="h-2" />
-                  </div>
-                )}
               </div>
-            )}
-          </CardContent>
-        </Card>
 
+              {/* Media Cards Container - matching WordPress styling */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
+                {videoInfo.medias.map((media, index) => {
+                  const sizeDisplay = media.formattedSize === "0 B" ? "-" : media.formattedSize;
+                  
+                  return (
+                    <div 
+                      key={index} 
+                      className="bg-card border border-border rounded-lg p-4 text-center shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+                    >
+                      <div className="space-y-3">
+                        <p className="text-sm">
+                          <strong>Quality:</strong> {media.quality}
+                        </p>
+                        <p className="text-sm">
+                          <strong>Format:</strong> {media.extension.toUpperCase()}
+                        </p>
+                        <p className="text-sm">
+                          <strong>Size:</strong> {sizeDisplay}
+                        </p>
+                        <Button
+                          onClick={() => handleDownload(media.url)}
+                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm py-2"
+                        >
+                          Download
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Feature Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="glass-effect border-border">
             <CardContent className="p-6 text-center">
