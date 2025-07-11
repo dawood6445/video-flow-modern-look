@@ -1,14 +1,114 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download, Facebook as FacebookIcon, CheckCircle, Video } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+interface VideoMedia {
+  url: string;
+  quality: string;
+  extension: string;
+  size: number;
+  formattedSize: string;
+  videoAvailable: boolean;
+  audioAvailable: boolean;
+  chunked: boolean;
+  cached: boolean;
+}
+
+interface VideoData {
+  status: string;
+  message: string;
+  url: string;
+  title: string;
+  thumbnail: string;
+  medias: VideoMedia[];
+}
+
 const Facebook = () => {
+  const [searchParams] = useSearchParams();
   const [url, setUrl] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [videoInfo, setVideoInfo] = useState<VideoData | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const videoUrl = searchParams.get('video_url');
+    if (videoUrl) {
+      setUrl(videoUrl);
+      handleAnalyze(videoUrl);
+    }
+  }, [searchParams]);
+
+  const fetchVideoData = async (videoUrl: string): Promise<VideoData> => {
+    const apiUrl = `https://api.latestvideodownloader.com/Home/GetVideo/?url=${encodeURIComponent(videoUrl)}&AccessKey=wECqRVdJmEBbHT94bY4s4w==&SourceID=9&VersionNo=1.111`;
+    
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch video data');
+    }
+
+    const data = await response.json();
+    return data;
+  };
+
+  const handleAnalyze = async (videoUrl?: string) => {
+    const urlToAnalyze = videoUrl || url;
+    
+    if (!urlToAnalyze) {
+      toast({
+        title: "Please enter a Facebook URL",
+        description: "You need to provide a Facebook video URL to download",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsAnalyzing(true);
+    setVideoInfo(null);
+    
+    try {
+      const data = await fetchVideoData(urlToAnalyze);
+      
+      if (data.status === "404" || !data.title || !data.thumbnail || !Array.isArray(data.medias) || data.medias.length === 0) {
+        toast({
+          title: "Error",
+          description: data.message || "The video URL could not be processed. Please try again with a valid URL.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setVideoInfo(data);
+      toast({
+        title: "Success!",
+        description: "Facebook video data fetched successfully"
+      });
+      
+    } catch (error) {
+      console.error('Error fetching video data:', error);
+      toast({
+        title: "Error",
+        description: "There was an error processing your request. Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleDownload = (mediaUrl: string) => {
+    window.open(mediaUrl, '_blank');
+  };
 
   const features = [
     "Download Facebook videos in HD",
@@ -18,22 +118,6 @@ const Facebook = () => {
     "Extract audio from videos",
     "Mobile and desktop compatible"
   ];
-
-  const handleDownload = () => {
-    if (!url) {
-      toast({
-        title: "Please enter a Facebook URL",
-        description: "You need to provide a Facebook video URL to download",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    toast({
-      title: "Processing Facebook video...",
-      description: "Your Facebook video is being processed for download"
-    });
-  };
 
   return (
     <div className="min-h-screen py-20">
@@ -70,16 +154,78 @@ const Facebook = () => {
                     placeholder="https://facebook.com/watch?v=... or https://fb.watch/..."
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAnalyze()}
                     className="flex-1 bg-background/50 border-border"
                   />
                   <Button 
-                    onClick={handleDownload}
+                    onClick={() => handleAnalyze()}
+                    disabled={isAnalyzing}
                     className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
                   >
                     <Download className="mr-2 h-4 w-4" />
-                    Download
+                    {isAnalyzing ? "Loading..." : "Download"}
                   </Button>
                 </div>
+
+                {/* Loading State */}
+                {isAnalyzing && (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">Fetching Video Data...</p>
+                    <p className="text-sm text-muted-foreground">Please wait while we fetch the video details.</p>
+                  </div>
+                )}
+
+                {/* Video Info Section */}
+                {videoInfo && !isAnalyzing && (
+                  <div className="space-y-6">
+                    {/* Thumbnail and Title Section */}
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-5">
+                      <img 
+                        src={videoInfo.thumbnail} 
+                        alt="Video Thumbnail"
+                        className="w-full md:w-72 h-48 md:h-40 object-cover rounded border flex-shrink-0"
+                      />
+                      <div className="flex-grow">
+                        <h3 className="text-xl font-semibold text-foreground leading-tight">
+                          {videoInfo.title}
+                        </h3>
+                      </div>
+                    </div>
+
+                    {/* Media Cards Container */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
+                      {videoInfo.medias.map((media, index) => {
+                        const sizeDisplay = media.formattedSize === "0 B" ? "-" : media.formattedSize;
+                        
+                        return (
+                          <div 
+                            key={index} 
+                            className="bg-card border border-border rounded-lg p-4 text-center shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+                          >
+                            <div className="space-y-3">
+                              <p className="text-sm">
+                                <strong>Quality:</strong> {media.quality}
+                              </p>
+                              <p className="text-sm">
+                                <strong>Format:</strong> {media.extension.toUpperCase()}
+                              </p>
+                              <p className="text-sm">
+                                <strong>Size:</strong> {sizeDisplay}
+                              </p>
+                              <Button
+                                onClick={() => handleDownload(media.url)}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm py-2"
+                              >
+                                Download
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="text-center p-4 bg-muted/20 rounded-lg">
