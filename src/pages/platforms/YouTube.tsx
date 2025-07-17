@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,23 @@ const YouTube = () => {
   const [videoInfo, setVideoInfo] = useState<VideoData | null>(null);
   const { toast } = useToast();
   const { data: contentData, loading: contentLoading } = useContentData('youtube');
+
+  // Move the document metadata useEffect before any conditional returns
+  useEffect(() => {
+    if (contentData) {
+      document.title = contentData.meta.title;
+      
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription) {
+        metaDescription.setAttribute('content', contentData.meta.description);
+      }
+      
+      const metaKeywords = document.querySelector('meta[name="keywords"]');
+      if (metaKeywords) {
+        metaKeywords.setAttribute('content', contentData.meta.keywords);
+      }
+    }
+  }, [contentData]);
 
   useEffect(() => {
     const videoUrl = searchParams.get('video_url');
@@ -114,23 +132,10 @@ const YouTube = () => {
     window.open(mediaUrl, '_blank');
   };
 
+  // Now handle loading state after all hooks have been called
   if (contentLoading || !contentData) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
-
-  useEffect(() => {
-    document.title = contentData.meta.title;
-    
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute('content', contentData.meta.description);
-    }
-    
-    const metaKeywords = document.querySelector('meta[name="keywords"]');
-    if (metaKeywords) {
-      metaKeywords.setAttribute('content', contentData.meta.keywords);
-    }
-  }, [contentData]);
 
   return (
     <div className="min-h-screen py-20">
