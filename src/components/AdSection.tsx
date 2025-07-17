@@ -1,70 +1,53 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Zap, TrendingUp, Heart, Star } from "lucide-react";
+import { ExternalLink, Zap, TrendingUp } from "lucide-react";
 
 const AdSection = () => {
   const ads = [
     {
       title: "Premium Video Editor",
-      description: "Edit your downloaded videos with professional tools and amazing effects",
+      description: "Edit your downloaded videos with professional tools",
       image: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=300&h=200&fit=crop",
       badge: "Sponsored",
       ctaText: "Try Free",
-      color: "bg-gradient-to-r from-pink-500 to-purple-500",
-      icon: <Zap className="h-4 w-4" />
+      color: "bg-blue-500"
     },
     {
       title: "Cloud Storage Solution",
-      description: "Store your videos safely in the cloud with 100GB free storage space",
+      description: "Store your videos safely in the cloud with 100GB free",
       image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&h=200&fit=crop",
-      badge: "Featured",
+      badge: "Ad",
       ctaText: "Get Started",
-      color: "bg-gradient-to-r from-sky-500 to-orange-500",
-      icon: <TrendingUp className="h-4 w-4" />
+      color: "bg-purple-500"
     }
   ];
 
   return (
-    <section className="py-12 bg-gradient-to-r from-purple-50/50 to-pink-50/50 dark:from-purple-950/50 dark:to-pink-950/50">
+    <section className="py-12 bg-muted/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-2">
-            <Heart className="h-5 w-5 text-pink-500" />
-            <h3 className="text-lg font-semibold gradient-text">Recommended for You</h3>
-          </div>
-          <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-            <Star className="h-3 w-3" />
-            <span>Advertisement</span>
-          </div>
+          <h3 className="text-lg font-semibold text-muted-foreground">Recommended for You</h3>
+          <span className="text-xs text-muted-foreground">Advertisement</span>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {ads.map((ad, index) => (
-            <Card key={index} className="social-card hover-scale overflow-hidden group">
+            <Card key={index} className="glass-effect hover:bg-card/40 transition-all duration-300 hover-scale overflow-hidden">
               <div className="relative">
                 <img 
                   src={ad.image} 
                   alt={ad.title}
-                  className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-32 object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                <span className={`absolute top-3 right-3 ${ad.color} text-white px-3 py-1 text-xs rounded-full font-medium flex items-center space-x-1 shadow-lg`}>
-                  {ad.icon}
-                  <span>{ad.badge}</span>
+                <span className={`absolute top-2 right-2 ${ad.color} text-white px-2 py-1 text-xs rounded-full`}>
+                  {ad.badge}
                 </span>
               </div>
-              <CardContent className="p-6">
-                <h4 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors">
-                  {ad.title}
-                </h4>
-                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                  {ad.description}
-                </p>
-                <Button 
-                  size="sm" 
-                  className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
-                >
+              <CardContent className="p-4">
+                <h4 className="font-semibold mb-2">{ad.title}</h4>
+                <p className="text-sm text-muted-foreground mb-4">{ad.description}</p>
+                <Button size="sm" variant="outline" className="w-full">
                   {ad.ctaText}
                   <ExternalLink className="ml-2 h-3 w-3" />
                 </Button>
