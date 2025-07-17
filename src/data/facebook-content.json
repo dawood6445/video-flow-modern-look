@@ -1,0 +1,77 @@
+
+{
+  "meta": {
+    "title": "Facebook Video Downloader - Download Facebook Videos in HD | VideoGet",
+    "description": "Download Facebook videos in HD quality. Save Facebook Watch content, live recordings, and regular videos. Free Facebook video downloader.",
+    "keywords": "Facebook video downloader, download Facebook videos, Facebook Watch downloader, Facebook live downloader, save Facebook videos"
+  },
+  "hero": {
+    "title": "Facebook Video Downloader",
+    "subtitle": "Download Facebook videos, Watch content, and Live recordings in high quality.",
+    "icon": "Facebook",
+    "color": "blue-600"
+  },
+  "features": [
+    "Download Facebook videos in HD",
+    "Save Facebook Watch content",
+    "Download private videos (with permission)",
+    "Support for Facebook Live recordings",
+    "Extract audio from videos",
+    "Mobile and desktop compatible"
+  ],
+  "content": {
+    "title": "Professional Facebook Video Downloader",
+    "description": "Download any Facebook video including personal posts, Facebook Watch shows, and live stream recordings. Our tool maintains original quality and supports all Facebook video formats.",
+    "image": "/placeholder.svg",
+    "points": [
+      {
+        "title": "Facebook Watch",
+        "description": "Download professional content from Facebook Watch"
+      },
+      {
+        "title": "Live Recordings",
+        "description": "Save Facebook Live streams after they end"
+      },
+      {
+        "title": "HD Quality",
+        "description": "Download videos in their original high definition"
+      },
+      {
+        "title": "Audio Extraction",
+        "description": "Extract audio tracks from Facebook videos"
+      }
+    ]
+  },
+  "usage": {
+    "title": "How to Download Facebook Videos",
+    "steps": [
+      "Find the Facebook video you want to download",
+      "Click on the video to open it",
+      "Copy the URL from your browser",
+      "Paste the URL in the field above",
+      "Click Download and choose your quality"
+    ]
+  },
+  "faq": [
+    {
+      "question": "Can I download Facebook Watch videos?",
+      "answer": "Yes! Our downloader fully supports Facebook Watch content and professional videos."
+    },
+    {
+      "question": "What about Facebook Live recordings?",
+      "answer": "You can download Facebook Live videos after the stream has ended and been saved to Facebook."
+    },
+    {
+      "question": "Can I download private Facebook videos?",
+      "answer": "Private videos can only be downloaded if you have permission to view them and the content owner allows it."
+    },
+    {
+      "question": "Does it work with Facebook Stories?",
+      "answer": "Yes, you can download Facebook Stories before they expire, similar to other story formats."
+    },
+    {
+      "question": "Can I extract just the audio?",
+      "answer": "Yes, our downloader can extract audio from Facebook videos and save them as MP3 files."
+    }
+  ]
+}

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Download, Youtube, Play, CheckCircle, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useContentData } from "@/hooks/useContentData";
+import ContentSection from "@/components/ContentSection";
+import FAQSection from "@/components/FAQSection";
 
 interface VideoMedia {
   url: string;
@@ -35,6 +37,7 @@ const YouTube = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [videoInfo, setVideoInfo] = useState<VideoData | null>(null);
   const { toast } = useToast();
+  const { data: contentData, loading: contentLoading } = useContentData('youtube');
 
   useEffect(() => {
     const videoUrl = searchParams.get('video_url');
@@ -111,18 +114,27 @@ const YouTube = () => {
     window.open(mediaUrl, '_blank');
   };
 
-  const features = [
-    "Download videos in 4K, 1080p, 720p, 480p",
-    "Extract audio in MP3 format",
-    "Download entire playlists",
-    "Supports YouTube Shorts",
-    "No registration required",
-    "Fast download speeds"
-  ];
+  if (contentLoading || !contentData) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  useEffect(() => {
+    document.title = contentData.meta.title;
+    
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', contentData.meta.description);
+    }
+    
+    const metaKeywords = document.querySelector('meta[name="keywords"]');
+    if (metaKeywords) {
+      metaKeywords.setAttribute('content', contentData.meta.keywords);
+    }
+  }, [contentData]);
 
   return (
     <div className="min-h-screen py-20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
@@ -131,10 +143,10 @@ const YouTube = () => {
             </div>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold font-poppins mb-4">
-            YouTube Video Downloader
+            {contentData.hero.title}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Download YouTube videos in HD quality for free. Support for 4K, playlists, and audio extraction.
+            {contentData.hero.subtitle}
           </p>
         </div>
 
@@ -229,13 +241,11 @@ const YouTube = () => {
                 )}
 
                 <div className="bg-muted/20 rounded-lg p-4">
-                  <h3 className="font-semibold mb-2">How to download YouTube videos:</h3>
+                  <h3 className="font-semibold mb-2">{contentData.usage.title}:</h3>
                   <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-                    <li>Copy the YouTube video URL</li>
-                    <li>Paste it in the input field above</li>
-                    <li>Click the Download button</li>
-                    <li>Choose your preferred quality</li>
-                    <li>Save the video to your device</li>
+                    {contentData.usage.steps.map((step, index) => (
+                      <li key={index}>{step}</li>
+                    ))}
                   </ol>
                 </div>
               </CardContent>
@@ -248,7 +258,7 @@ const YouTube = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {features.map((feature, index) => (
+                  {contentData.features.map((feature, index) => (
                     <div key={index} className="flex items-center space-x-2">
                       <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
                       <span className="text-sm">{feature}</span>
@@ -318,6 +328,17 @@ const YouTube = () => {
             </Card>
           </div>
         </div>
+
+        {/* Content Section */}
+        <ContentSection
+          title={contentData.content.title}
+          description={contentData.content.description}
+          image={contentData.content.image}
+          points={contentData.content.points}
+        />
+
+        {/* FAQ Section */}
+        <FAQSection faqs={contentData.faq} />
       </div>
     </div>
   );

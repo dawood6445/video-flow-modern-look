@@ -1,0 +1,77 @@
+
+{
+  "meta": {
+    "title": "TikTok Video Downloader - Download TikTok Videos Without Watermark | VideoGet",
+    "description": "Download TikTok videos without watermark in HD quality. Fast and free TikTok downloader for all devices. Save TikTok videos instantly.",
+    "keywords": "TikTok downloader, download TikTok videos, TikTok without watermark, TikTok video saver, free TikTok downloader"
+  },
+  "hero": {
+    "title": "TikTok Video Downloader",
+    "subtitle": "Download TikTok videos without watermark in HD quality. Fast, free, and works on all devices.",
+    "icon": "Music",
+    "color": "pink-500"
+  },
+  "features": [
+    "Download without watermark",
+    "HD quality videos",
+    "Audio extraction (MP3)",
+    "Fast processing speed",
+    "Mobile and desktop support",
+    "No registration needed"
+  ],
+  "content": {
+    "title": "Best TikTok Video Downloader",
+    "description": "Save your favorite TikTok videos without watermarks. Our downloader preserves the original quality and removes TikTok branding, giving you clean videos for personal use.",
+    "image": "/placeholder.svg",
+    "points": [
+      {
+        "title": "Watermark Free",
+        "description": "Download TikTok videos without any watermarks or logos"
+      },
+      {
+        "title": "Original Quality",
+        "description": "Maintain the original video quality from TikTok"
+      },  
+      {
+        "title": "Audio Downloads",
+        "description": "Extract audio from TikTok videos as MP3 files"
+      },
+      {
+        "title": "All Devices",
+        "description": "Works on mobile phones, tablets, and desktop computers"
+      }
+    ]
+  },
+  "usage": {
+    "title": "How to Download TikTok Videos",
+    "steps": [
+      "Open TikTok and find the video you want",
+      "Tap 'Share' and copy the video link",
+      "Paste the link in our downloader",
+      "Click Download and choose quality",
+      "Save the video without watermark"
+    ]
+  },
+  "faq": [
+    {
+      "question": "Can I download TikTok videos without watermark?",
+      "answer": "Yes! Our downloader removes TikTok watermarks and gives you clean videos in original quality."
+    },
+    {
+      "question": "Is it safe to use this TikTok downloader?",
+      "answer": "Absolutely! Our service is secure, doesn't store your data, and doesn't require any personal information."
+    },
+    {
+      "question": "Can I download TikTok audio only?",
+      "answer": "Yes, you can extract audio from TikTok videos and download them as MP3 files."
+    },
+    {
+      "question": "Does it work on mobile devices?",
+      "answer": "Yes, our TikTok downloader works perfectly on all mobile devices, tablets, and computers."
+    },
+    {
+      "question": "Are there any limits?",
+      "answer": "No limits! Download as many TikTok videos as you want, completely free."
+    }
+  ]
+}

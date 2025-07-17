@@ -1,0 +1,77 @@
+
+{
+  "meta": {
+    "title": "Instagram Video Downloader - Download Instagram Videos, Stories, Reels | VideoGet",
+    "description": "Download Instagram videos, stories, and reels in HD quality. Free Instagram downloader for posts, IGTV, and stories. Save Instagram content easily.",
+    "keywords": "Instagram downloader, download Instagram videos, Instagram stories downloader, Instagram reels downloader, IGTV downloader"
+  },
+  "hero": {
+    "title": "Instagram Video Downloader",
+    "subtitle": "Download Instagram videos, stories, and reels in HD quality. Support for posts, IGTV, and stories.",
+    "icon": "Instagram",
+    "color": "pink-600"
+  },
+  "features": [
+    "Download Instagram videos",
+    "Save Instagram stories",
+    "Download Instagram reels",
+    "IGTV video downloads",
+    "HD quality downloads",
+    "Mobile and desktop support"
+  ],
+  "content": {
+    "title": "Complete Instagram Media Downloader",
+    "description": "Save all types of Instagram content including videos, stories, reels, and IGTV. Our downloader preserves original quality and works with both public and private accounts (with permission).",
+    "image": "/placeholder.svg",
+    "points": [
+      {
+        "title": "All Content Types",
+        "description": "Download videos, stories, reels, and IGTV content"
+      },
+      {
+        "title": "Story Saver",
+        "description": "Save Instagram stories before they disappear"
+      },
+      {
+        "title": "Reels Download", 
+        "description": "Download Instagram reels in original quality"
+      },
+      {
+        "title": "IGTV Support",
+        "description": "Save long-form IGTV videos to your device"
+      }
+    ]
+  },
+  "usage": {
+    "title": "How to Download Instagram Content",
+    "steps": [
+      "Open Instagram and find the content",
+      "Copy the post or story link",
+      "Paste the URL in our downloader",
+      "Select the content type and quality",
+      "Download and save to your device"
+    ]
+  },
+  "faq": [
+    {
+      "question": "Can I download Instagram stories?",
+      "answer": "Yes, you can download Instagram stories before they expire. Just copy the story link and paste it in our downloader."
+    },
+    {
+      "question": "Does it work with private accounts?",
+      "answer": "Our downloader works with public content. For private accounts, you need permission from the account owner."
+    },
+    {
+      "question": "Can I download Instagram reels?",
+      "answer": "Yes! Our downloader fully supports Instagram reels and maintains the original video quality."
+    },
+    {
+      "question": "What about IGTV videos?",
+      "answer": "IGTV videos are fully supported. You can download long-form Instagram videos in HD quality."
+    },
+    {
+      "question": "Is there a size limit?",
+      "answer": "No size limits! Download Instagram content of any length or file size."
+    }
+  ]
+}

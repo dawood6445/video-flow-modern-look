@@ -9,13 +9,11 @@ import Download from "./pages/Download";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import About from "./pages/About";
-import Pricing from "./pages/Pricing";
 import Contact from "./pages/Contact";
 import YouTube from "./pages/platforms/YouTube";
 import TikTok from "./pages/platforms/TikTok";
 import Instagram from "./pages/platforms/Instagram";
 import Facebook from "./pages/platforms/Facebook";
-import Twitter from "./pages/platforms/Twitter";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -37,13 +35,11 @@ const App = () => (
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/about" element={<About />} />
-              <Route path="/pricing" element={<Pricing />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/platforms/youtube" element={<YouTube />} />
               <Route path="/platforms/tiktok" element={<TikTok />} />
               <Route path="/platforms/instagram" element={<Instagram />} />
               <Route path="/platforms/facebook" element={<Facebook />} />
-              <Route path="/platforms/twitter" element={<Twitter />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>

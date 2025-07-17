@@ -18,8 +18,6 @@ const Navbar = () => {
     { name: "Home", path: "/" },
     { name: "Download", path: "/download" },
     { name: "Blog", path: "/blog" },
-    { name: "About", path: "/about" },
-    { name: "Pricing", path: "/pricing" },
     { name: "Contact", path: "/contact" },
   ];
 
@@ -28,7 +26,10 @@ const Navbar = () => {
     { name: "TikTok", path: "/platforms/tiktok" },
     { name: "Instagram", path: "/platforms/instagram" },
     { name: "Facebook", path: "/platforms/facebook" },
-    { name: "Twitter", path: "/platforms/twitter" },
+  ];
+
+  const moreItems = [
+    { name: "About", path: "/about" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -64,6 +65,21 @@ const Navbar = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-card border-border">
                 {platformItems.map((item) => (
+                  <DropdownMenuItem key={item.name} asChild>
+                    <Link to={item.path} className="w-full">
+                      {item.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+                More <ChevronDown className="ml-1 h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-card border-border">
+                {moreItems.map((item) => (
                   <DropdownMenuItem key={item.name} asChild>
                     <Link to={item.path} className="w-full">
                       {item.name}
@@ -111,6 +127,19 @@ const Navbar = () => {
             <div className="border-t border-border pt-2 mt-4">
               <p className="text-xs text-muted-foreground px-3 py-1">Platforms</p>
               {platformItems.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  className="block py-2 px-3 rounded-md text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+            <div className="border-t border-border pt-2 mt-4">
+              <p className="text-xs text-muted-foreground px-3 py-1">More</p>
+              {moreItems.map((item) => (
                 <Link
                   key={item.name}
                   to={item.path}

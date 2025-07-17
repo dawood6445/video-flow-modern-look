@@ -1,0 +1,77 @@
+
+{
+  "meta": {
+    "title": "YouTube Video Downloader - Download HD Videos Free | VideoGet",
+    "description": "Download YouTube videos in HD quality for free. Support for 4K, 1080p, playlists, and audio extraction. Fast and secure YouTube downloader.",
+    "keywords": "YouTube downloader, download YouTube videos, HD video downloader, YouTube to MP4, free video downloader"
+  },
+  "hero": {
+    "title": "YouTube Video Downloader",
+    "subtitle": "Download YouTube videos in HD quality for free. Support for 4K, playlists, and audio extraction.",
+    "icon": "Youtube",
+    "color": "red-500"
+  },
+  "features": [
+    "Download videos in 4K, 1080p, 720p, 480p",
+    "Extract audio in MP3 format",
+    "Download entire playlists",
+    "Supports YouTube Shorts",
+    "No registration required",
+    "Fast download speeds"
+  ],
+  "content": {
+    "title": "Why Choose Our YouTube Downloader?",
+    "description": "Our YouTube downloader is the fastest and most reliable way to save YouTube videos to your device. With support for all video qualities and formats, you can enjoy your favorite content offline anytime.",
+    "image": "/placeholder.svg",
+    "points": [
+      {
+        "title": "High Quality Downloads",
+        "description": "Download videos in original quality up to 4K resolution"
+      },
+      {
+        "title": "Multiple Formats",
+        "description": "Support for MP4, MP3, and other popular formats"
+      },
+      {
+        "title": "Playlist Support",
+        "description": "Download entire playlists with just one click"
+      },
+      {
+        "title": "No Software Required",
+        "description": "Works directly in your browser without any downloads"
+      }
+    ]
+  },
+  "usage": {
+    "title": "How to Download YouTube Videos",
+    "steps": [
+      "Copy the YouTube video URL",
+      "Paste it in the input field above",
+      "Click the Download button",
+      "Choose your preferred quality",
+      "Save the video to your device"
+    ]
+  },
+  "faq": [
+    {
+      "question": "Is it legal to download YouTube videos?",
+      "answer": "You should only download videos you have permission to use. Always respect copyright laws and YouTube's Terms of Service."
+    },
+    {
+      "question": "What video qualities are supported?",
+      "answer": "We support all qualities available on YouTube, including 4K (2160p), Full HD (1080p), HD (720p), and SD (480p)."
+    },
+    {
+      "question": "Can I download YouTube playlists?",
+      "answer": "Yes, our downloader supports downloading entire YouTube playlists. Just paste the playlist URL and we'll process all videos."
+    },
+    {
+      "question": "Is there a limit on downloads?",
+      "answer": "No, there are no limits on the number of videos you can download. Our service is completely free to use."
+    },
+    {
+      "question": "Do I need to install any software?",
+      "answer": "No installation required! Our YouTube downloader works directly in your web browser."
+    }
+  ]
+}
