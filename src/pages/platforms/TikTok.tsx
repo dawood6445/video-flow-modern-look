@@ -1,11 +1,14 @@
-
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Download, Music, CheckCircle, Sparkles } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Download, Music, CheckCircle, Sparkles, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useContentData } from "@/hooks/useContentData";
+import ContentSection from "@/components/ContentSection";
+import FAQSection from "@/components/FAQSection";
 
 interface VideoMedia {
   url: string;
@@ -34,6 +37,23 @@ const TikTok = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [videoInfo, setVideoInfo] = useState<VideoData | null>(null);
   const { toast } = useToast();
+  const { data: contentData, loading: contentLoading } = useContentData('tiktok');
+
+  useEffect(() => {
+    if (contentData) {
+      document.title = contentData.meta.title;
+      
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription) {
+        metaDescription.setAttribute('content', contentData.meta.description);
+      }
+      
+      const metaKeywords = document.querySelector('meta[name="keywords"]');
+      if (metaKeywords) {
+        metaKeywords.setAttribute('content', contentData.meta.keywords);
+      }
+    }
+  }, [contentData]);
 
   useEffect(() => {
     const videoUrl = searchParams.get('video_url');
@@ -110,18 +130,13 @@ const TikTok = () => {
     window.open(mediaUrl, '_blank');
   };
 
-  const features = [
-    "Download TikTok videos without watermark",
-    "Save TikTok audio/music tracks",
-    "Support for all video qualities",
-    "Bulk download from profiles",
-    "Mobile-friendly interface",
-    "No app installation required"
-  ];
+  if (contentLoading || !contentData) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen py-20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
@@ -130,10 +145,10 @@ const TikTok = () => {
             </div>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold font-poppins mb-4">
-            TikTok Video Downloader
+            {contentData.hero.title}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Download TikTok videos without watermark in HD quality. Save your favorite TikTok content for offline viewing.
+            {contentData.hero.subtitle}
           </p>
         </div>
 
@@ -240,13 +255,11 @@ const TikTok = () => {
                 </div>
 
                 <div className="bg-muted/20 rounded-lg p-4">
-                  <h3 className="font-semibold mb-2">How to download TikTok videos:</h3>
+                  <h3 className="font-semibold mb-2">{contentData.usage.title}:</h3>
                   <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-                    <li>Open TikTok and find the video you want</li>
-                    <li>Tap "Share" and copy the link</li>
-                    <li>Paste the link in the field above</li>
-                    <li>Click Download to get your video</li>
-                    <li>Choose between video or audio-only download</li>
+                    {contentData.usage.steps.map((step, index) => (
+                      <li key={index}>{step}</li>
+                    ))}
                   </ol>
                 </div>
               </CardContent>
@@ -259,7 +272,7 @@ const TikTok = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {features.map((feature, index) => (
+                  {contentData.features.map((feature, index) => (
                     <div key={index} className="flex items-center space-x-2">
                       <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
                       <span className="text-sm">{feature}</span>
@@ -279,16 +292,23 @@ const TikTok = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 {[
-                  { type: "Video (No Watermark)", format: "MP4", quality: "HD", icon: "🎥" },
-                  { type: "Video (Original)", format: "MP4", quality: "HD", icon: "📱" },
-                  { type: "Audio Only", format: "MP3", quality: "High", icon: "🎵" },
-                  { type: "Cover Image", format: "JPG", quality: "High", icon: "🖼️" }
+                  { type: "Video (No Watermark)", format: "MP4", quality: "HD", icon: "🎥", popular: true },
+                  { type: "Video (Original)", format: "MP4", quality: "HD", icon: "📱", popular: false },
+                  { type: "Audio Only", format: "MP3", quality: "High", icon: "🎵", popular: true },
+                  { type: "Cover Image", format: "JPG", quality: "High", icon: "🖼️", popular: false }
                 ].map((option, index) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <span className="text-lg">{option.icon}</span>
                       <div>
-                        <div className="font-medium text-sm">{option.type}</div>
+                        <div className="flex items-center space-x-2">
+                          <span className="font-medium text-sm">{option.type}</span>
+                          {option.popular && (
+                            <Badge variant="secondary" className="bg-primary/10 text-primary text-xs">
+                              Popular
+                            </Badge>
+                          )}
+                        </div>
                         <div className="text-xs text-muted-foreground">{option.format} • {option.quality}</div>
                       </div>
                     </div>
@@ -297,27 +317,13 @@ const TikTok = () => {
               </CardContent>
             </Card>
 
-            {/* Trending */}
-            <Card className="glass-effect border-border">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center">
-                  <Sparkles className="mr-2 h-4 w-4 text-pink-500" />
-                  TikTok Trends
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>• Dance challenges and viral moves</p>
-                <p>• Comedy skits and memes</p>
-                <p>• Educational content and tutorials</p>
-                <p>• Music covers and original sounds</p>
-                <p>• Food recipes and cooking tips</p>
-              </CardContent>
-            </Card>
-
             {/* Tips */}
             <Card className="glass-effect border-border">
               <CardHeader>
-                <CardTitle className="text-lg">Download Tips</CardTitle>
+                <CardTitle className="text-lg flex items-center">
+                  <Star className="mr-2 h-4 w-4 text-primary" />
+                  Pro Tips
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
                 <p>• Use "No Watermark" option for clean videos</p>
@@ -326,8 +332,77 @@ const TikTok = () => {
                 <p>• Check video privacy settings before downloading</p>
               </CardContent>
             </Card>
+
+            {/* Legal Notice */}
+            <Card className="glass-effect border-border border-yellow-500/20">
+              <CardContent className="p-4">
+                <div className="text-xs text-muted-foreground">
+                  <strong className="text-yellow-500">Legal Notice:</strong> Only download videos you have permission to use. Respect copyright laws and TikTok's Terms of Service.
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
+
+        {/* Demo Section */}
+        {contentData.demo && (
+          <Card className="glass-effect border-border">
+            <CardContent className="p-8">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold mb-4">{contentData.demo.title}</h2>
+                <p className="text-muted-foreground mb-6 leading-relaxed">{contentData.demo.description}</p>
+                <img 
+                  src={contentData.demo.image} 
+                  alt={contentData.demo.title}
+                  className="w-full max-w-2xl mx-auto h-64 object-cover rounded-lg shadow-lg"
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                {contentData.demo.features_demo.map((feature, index) => (
+                  <div key={index} className="text-center">
+                    <img 
+                      src={feature.image} 
+                      alt={feature.title}
+                      className="w-full h-48 object-cover rounded-lg mb-4"
+                    />
+                    <h3 className="font-semibold mb-2">{feature.title}</h3>
+                    <p className="text-sm text-muted-foreground">{feature.description}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Content Section */}
+        <ContentSection
+          title={contentData.content.title}
+          description={contentData.content.description}
+          image={contentData.content.image}
+          points={contentData.content.points}
+        />
+
+        {/* Detailed Content Sections */}
+        {contentData.detailed_content && (
+          <div className="space-y-8">
+            {contentData.detailed_content.sections.map((section, index) => (
+              <Card key={index} className="glass-effect border-border">
+                <CardContent className="p-8">
+                  <h2 className="text-2xl font-bold mb-4">{section.title}</h2>
+                  <div className="prose prose-lg max-w-none text-muted-foreground">
+                    {section.content.split('\n\n').map((paragraph, pIndex) => (
+                      <p key={pIndex} className="mb-4 leading-relaxed">{paragraph}</p>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* FAQ Section */}
+        <FAQSection faqs={contentData.faq} />
       </div>
     </div>
   );
