@@ -1,328 +1,298 @@
 
-import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useContentData } from "@/hooks/useContentData";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Twitter, CheckCircle, Download, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Download, Twitter as TwitterIcon, CheckCircle, MessageCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent } from "@/components/ui/card";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import ContentSection from "@/components/ContentSection";
+import FAQSection from "@/components/FAQSection";
+import AdSection from "@/components/AdSection";
 
-interface VideoMedia {
-  url: string;
-  quality: string;
-  extension: string;
-  size: number;
-  formattedSize: string;
-  videoAvailable: boolean;
-  audioAvailable: boolean;
-  chunked: boolean;
-  cached: boolean;
-}
-
-interface VideoData {
-  status: string;
-  message: string;
-  url: string;
-  title: string;
-  thumbnail: string;
-  medias: VideoMedia[];
-}
-
-const Twitter = () => {
-  const [searchParams] = useSearchParams();
+const TwitterDownloader = () => {
+  const { data, loading } = useContentData('twitter');
   const [url, setUrl] = useState("");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [videoInfo, setVideoInfo] = useState<VideoData | null>(null);
-  const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const videoUrl = searchParams.get('video_url');
-    if (videoUrl) {
-      setUrl(videoUrl);
-      handleAnalyze(videoUrl);
-    }
-  }, [searchParams]);
-
-  const fetchVideoData = async (videoUrl: string): Promise<VideoData> => {
-    const apiUrl = `https://api.latestvideodownloader.com/Home/GetVideo/?url=${encodeURIComponent(videoUrl)}&AccessKey=wECqRVdJmEBbHT94bY4s4w==&SourceID=9&VersionNo=1.111`;
-    
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch video data');
-    }
-
-    const data = await response.json();
-    return data;
-  };
-
-  const handleAnalyze = async (videoUrl?: string) => {
-    const urlToAnalyze = videoUrl || url;
-    
-    if (!urlToAnalyze) {
-      toast({
-        title: "Please enter a Twitter URL",
-        description: "You need to provide a Twitter post URL to download",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsAnalyzing(true);
-    setVideoInfo(null);
-    
-    try {
-      const data = await fetchVideoData(urlToAnalyze);
-      
-      if (data.status === "404" || !data.title || !data.thumbnail || !Array.isArray(data.medias) || data.medias.length === 0) {
-        toast({
-          title: "Error",
-          description: data.message || "The video URL could not be processed. Please try again with a valid URL.",
-          variant: "destructive"
-        });
-        return;
+    if (data?.meta) {
+      document.title = data.meta.title;
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription) {
+        metaDescription.setAttribute('content', data.meta.description);
       }
+      const metaKeywords = document.querySelector('meta[name="keywords"]');
+      if (metaKeywords) {
+        metaKeywords.setAttribute('content', data.meta.keywords);
+      }
+    }
+  }, [data]);
 
-      setVideoInfo(data);
-      toast({
-        title: "Success!",
-        description: "Twitter content data fetched successfully"
-      });
-      
-    } catch (error) {
-      console.error('Error fetching video data:', error);
-      toast({
-        title: "Error",
-        description: "There was an error processing your request. Please try again later.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsAnalyzing(false);
+  const handleDownload = () => {
+    if (url.trim()) {
+      navigate(`/download?video_url=${encodeURIComponent(url.trim())}`);
     }
   };
 
-  const handleDownload = (mediaUrl: string) => {
-    window.open(mediaUrl, '_blank');
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleDownload();
+    }
   };
 
-  const features = [
-    "Download Twitter videos in original quality",
-    "Save Twitter GIFs as MP4",
-    "Download Twitter Spaces recordings",
-    "Support for tweet threads with videos",
-    "Extract Twitter video thumbnails",
-    "No rate limits or restrictions"
-  ];
-
-  return (
-    <div className="min-h-screen py-20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-6">
-            <div className="bg-blue-400 p-4 rounded-full">
-              <TwitterIcon className="h-12 w-12 text-white" />
-            </div>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold font-poppins mb-4">
-            Twitter Video Downloader
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Download Twitter videos, GIFs, and Spaces recordings in high quality.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Download Form */}
-          <div className="lg:col-span-2">
-            <Card className="glass-effect border-border">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Download className="mr-2 h-5 w-5 text-primary" />
-                  Download Twitter Video
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Input
-                    type="url"
-                    placeholder="https://twitter.com/username/status/... or https://x.com/..."
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAnalyze()}
-                    className="flex-1 bg-background/50 border-border"
-                  />
-                  <Button 
-                    onClick={() => handleAnalyze()}
-                    disabled={isAnalyzing}
-                    className="bg-blue-400 hover:bg-blue-500 text-white font-medium"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    {isAnalyzing ? "Loading..." : "Download"}
-                  </Button>
-                </div>
-
-                {/* Loading State */}
-                {isAnalyzing && (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p className="text-muted-foreground">Fetching Video Data...</p>
-                    <p className="text-sm text-muted-foreground">Please wait while we fetch the video details.</p>
-                  </div>
-                )}
-
-                {/* Video Info Section */}
-                {videoInfo && !isAnalyzing && (
-                  <div className="space-y-6">
-                    {/* Thumbnail and Title Section */}
-                    <div className="flex flex-col md:flex-row items-start md:items-center gap-5">
-                      <img 
-                        src={videoInfo.thumbnail} 
-                        alt="Video Thumbnail"
-                        className="w-full md:w-72 h-48 md:h-40 object-cover rounded border flex-shrink-0"
-                      />
-                      <div className="flex-grow">
-                        <h3 className="text-xl font-semibold text-foreground leading-tight">
-                          {videoInfo.title}
-                        </h3>
-                      </div>
-                    </div>
-
-                    {/* Media Cards Container */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
-                      {videoInfo.medias.map((media, index) => {
-                        const sizeDisplay = media.formattedSize === "0 B" ? "-" : media.formattedSize;
-                        
-                        return (
-                          <div 
-                            key={index} 
-                            className="bg-card border border-border rounded-lg p-4 text-center shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300"
-                          >
-                            <div className="space-y-3">
-                              <p className="text-sm">
-                                <strong>Quality:</strong> {media.quality}
-                              </p>
-                              <p className="text-sm">
-                                <strong>Format:</strong> {media.extension.toUpperCase()}
-                              </p>
-                              <p className="text-sm">
-                                <strong>Size:</strong> {sizeDisplay}
-                              </p>
-                              <Button
-                                onClick={() => handleDownload(media.url)}
-                                className="w-full bg-blue-400 hover:bg-blue-500 text-white text-sm py-2"
-                              >
-                                Download
-                              </Button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-muted/20 rounded-lg">
-                    <MessageCircle className="h-8 w-8 text-blue-400 mx-auto mb-2" />
-                    <h3 className="font-medium text-sm">Tweet Videos</h3>
-                    <p className="text-xs text-muted-foreground">Videos from tweets</p>
-                  </div>
-                  <div className="text-center p-4 bg-muted/20 rounded-lg">
-                    <TwitterIcon className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                    <h3 className="font-medium text-sm">Twitter Spaces</h3>
-                    <p className="text-xs text-muted-foreground">Audio recordings</p>
-                  </div>
-                </div>
-
-                <div className="bg-muted/20 rounded-lg p-4">
-                  <h3 className="font-semibold mb-2">How to download Twitter videos:</h3>
-                  <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-                    <li>Find the tweet with the video you want</li>
-                    <li>Click on the tweet to open it</li>
-                    <li>Copy the URL from your browser</li>
-                    <li>Paste the URL in the field above</li>
-                    <li>Click Download to save the video</li>
-                  </ol>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Features */}
-            <Card className="glass-effect border-border mt-6">
-              <CardHeader>
-                <CardTitle>Twitter Download Features</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {features.map((feature, index) => (
-                    <div key={index} className="flex items-center space-x-2">
-                      <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span className="text-sm">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Content Types */}
-            <Card className="glass-effect border-border">
-              <CardHeader>
-                <CardTitle className="text-lg">Supported Content</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {[
-                  { type: "Twitter Videos", format: "MP4", size: "Up to 2.2GB" },
-                  { type: "Twitter GIFs", format: "MP4", size: "Various" },
-                  { type: "Twitter Spaces", format: "MP3", size: "Audio only" },
-                  { type: "Video Thumbnails", format: "JPG", size: "High-res" }
-                ].map((option, index) => (
-                  <div key={index} className="p-3 bg-muted/20 rounded-lg">
-                    <div className="font-medium text-sm">{option.type}</div>
-                    <div className="text-xs text-muted-foreground">{option.format} • {option.size}</div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* Quality Info */}
-            <Card className="glass-effect border-border">
-              <CardHeader>
-                <CardTitle className="text-lg">Quality Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>• Original quality preserved</p>
-                <p>• Up to 1080p for most videos</p>
-                <p>• GIFs converted to MP4</p>
-                <p>• Audio quality maintained</p>
-              </CardContent>
-            </Card>
-
-            {/* Tips */}
-            <Card className="glass-effect border-border">
-              <CardHeader>
-                <CardTitle className="text-lg">Twitter Tips</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>• Works with both twitter.com and x.com URLs</p>
-                <p>• Download GIFs as looping MP4 files</p>
-                <p>• Save viral content before it gets deleted</p>
-                <p>• Extract high-quality thumbnails</p>
-              </CardContent>
-            </Card>
-          </div>
+  if (loading) {
+    return (
+      <div className="min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <Skeleton className="h-12 w-3/4 mx-auto mb-4" />
+          <Skeleton className="h-6 w-1/2 mx-auto mb-8" />
+          <Skeleton className="h-20 w-full max-w-2xl mx-auto" />
         </div>
       </div>
+    );
+  }
+
+  if (!data) {
+    return <div>Error loading content</div>;
+  }
+
+  return (
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden py-20 lg:py-32">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-blue-400/10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="flex justify-center mb-6">
+              <div className="p-4 rounded-2xl bg-blue-400/10 border border-blue-400/20">
+                <Twitter className="h-12 w-12 text-blue-400" />
+              </div>
+            </div>
+            
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold font-poppins mb-6 animate-fade-in">
+              {data.hero.title}
+            </h1>
+            <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto animate-slide-up">
+              {data.hero.subtitle}
+            </p>
+            
+            <div className="max-w-2xl mx-auto mb-8 animate-slide-up">
+              <div className="flex flex-col sm:flex-row gap-4 glass-effect p-2 rounded-lg">
+                <Input
+                  type="url"
+                  placeholder="Paste Twitter video URL here..."
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  className="flex-1 h-12 bg-background/50 border-border text-foreground placeholder:text-muted-foreground"
+                />
+                <Button 
+                  onClick={handleDownload}
+                  className="h-12 px-8 bg-gradient-to-r from-primary to-blue-400 hover:from-primary/90 hover:to-blue-400/90 text-black font-medium w-full sm:w-auto"
+                >
+                  <Download className="mr-2 h-5 w-5" />
+                  Download
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto mb-8">
+              <Button 
+                onClick={handleDownload}
+                variant="outline"
+                className="h-12 border-blue-400/30 hover:bg-blue-400/10"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Download Video
+              </Button>
+              <Button 
+                onClick={handleDownload}
+                variant="outline" 
+                className="h-12 border-blue-400/30 hover:bg-blue-400/10"
+              >
+                <Music className="mr-2 h-4 w-4" />
+                Extract Audio (MP3)
+              </Button>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
+              <span className="flex items-center"><CheckCircle className="mr-1 h-4 w-4 text-primary" /> Free Download</span>
+              <span className="flex items-center"><CheckCircle className="mr-1 h-4 w-4 text-primary" /> All Formats</span>
+              <span className="flex items-center"><CheckCircle className="mr-1 h-4 w-4 text-primary" /> HD Quality</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <AdSection />
+
+      {/* Features Grid */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold font-poppins mb-4">
+              Twitter Video Download Features
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Professional tools for downloading Twitter video content
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {data.features.slice(0, 8).map((feature, index) => (
+              <Card key={index} className="glass-effect hover:bg-card/40 transition-all duration-300 hover-scale border-border">
+                <CardContent className="p-6 text-center">
+                  <div className="flex justify-center mb-4">
+                    <CheckCircle className="h-8 w-8 text-blue-400" />
+                  </div>
+                  <p className="text-sm font-medium">
+                    {feature}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Content Section */}
+      <section className="py-20 bg-card/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <ContentSection 
+            title={data.content.title}
+            description={data.content.description}
+            image={data.content.image}
+            points={data.content.points}
+          />
+        </div>
+      </section>
+
+      {/* Usage Steps */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold font-poppins mb-4">
+              {data.usage.title}
+            </h2>
+            {data.usage.intro && (
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                {data.usage.intro}
+              </p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {data.usage.steps.map((step, index) => (
+              <div key={index} className="glass-effect p-6 rounded-lg border-border">
+                <div className="flex items-start space-x-4">
+                  <div className="bg-gradient-to-r from-primary to-blue-400 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-black flex-shrink-0">
+                    {index + 1}
+                  </div>
+                  <p className="text-sm leading-relaxed">{step}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {data.usage.tips && (
+            <div className="glass-effect p-6 rounded-lg border-l-4 border-l-blue-400">
+              <h3 className="font-semibold mb-4 flex items-center">
+                <CheckCircle className="mr-2 h-5 w-5 text-blue-400" />
+                Pro Tips
+              </h3>
+              <ul className="space-y-2">
+                {data.usage.tips.map((tip, index) => (
+                  <li key={index} className="text-sm text-muted-foreground flex items-start">
+                    <span className="mr-2 text-blue-400">•</span>
+                    {tip}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <AdSection />
+
+      {/* Demo Section */}
+      {data.demo && (
+        <section className="py-20 bg-card/20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold font-poppins mb-4">
+                {data.demo.title}
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+                {data.demo.description}
+              </p>
+              <div className="relative max-w-4xl mx-auto">
+                <img 
+                  src={data.demo.image} 
+                  alt={data.demo.title}
+                  className="w-full h-64 md:h-80 object-cover rounded-2xl shadow-2xl"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {data.demo.features_demo.map((feature, index) => (
+                <Card key={index} className="glass-effect hover:bg-card/40 transition-all duration-300 hover-scale border-border">
+                  <CardContent className="p-6">
+                    <img 
+                      src={feature.image} 
+                      alt={feature.title}
+                      className="w-full h-40 object-cover rounded-lg mb-4"
+                    />
+                    <h3 className="text-lg font-semibold font-poppins mb-2">
+                      {feature.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {feature.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Detailed Content */}
+      {data.detailed_content && (
+        <section className="py-20">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="space-y-12">
+              {data.detailed_content.sections.map((section, index) => (
+                <div key={index} className="glass-effect p-8 rounded-2xl border-border">
+                  <h2 className="text-2xl md:text-3xl font-bold font-poppins mb-6">
+                    {section.title}
+                  </h2>
+                  <div className="prose prose-lg max-w-none text-muted-foreground">
+                    {section.content.split('\n\n').map((paragraph, pIndex) => (
+                      <p key={pIndex} className="mb-4 leading-relaxed">
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* FAQ Section */}
+      <section className="py-20 bg-card/20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FAQSection faqs={data.faq} />
+        </div>
+      </section>
     </div>
   );
 };
 
-export default Twitter;
+export default TwitterDownloader;
