@@ -6,6 +6,28 @@ interface ContentPoint {
   description: string;
 }
 
+interface DemoFeature {
+  title: string;
+  description: string;
+  image: string;
+}
+
+interface Demo {
+  title: string;
+  description: string;
+  image: string;
+  features_demo: DemoFeature[];
+}
+
+interface DetailedContentSection {
+  title: string;
+  content: string;
+}
+
+interface DetailedContent {
+  sections: DetailedContentSection[];
+}
+
 interface ContentData {
   meta: {
     title: string;
@@ -27,8 +49,12 @@ interface ContentData {
   };
   usage: {
     title: string;
+    intro?: string;
     steps: string[];
+    tips?: string[];
   };
+  demo?: Demo;
+  detailed_content?: DetailedContent;
   faq: Array<{
     question: string;
     answer: string;
